@@ -55,3 +55,80 @@ jobs:
         env:
           HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
         run: bash deploy/publish-static.sh pallet-site.zip
+
+  pr-status:
+    name: Update staging status on pull request
+    if: >-
+      always() &&
+      ((github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.head_ref == 'stage' && github.base_ref == 'main') ||
+       (github.event_name != 'pull_request' && github.ref == 'refs/heads/stage'))
+    needs: [lint, e2e, package, deploy]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    concurrency:
+      group: pallet-stage-pr-comment
+      cancel-in-progress: false
+    steps:
+      - uses: actions/github-script@v8
+        env:
+          LINT_RESULT: ${{ needs.lint.result }}
+          E2E_RESULT: ${{ needs.e2e.result }}
+          PACKAGE_RESULT: ${{ needs.package.result }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+        with:
+          script: |
+            const repo = context.repo;
+            const fromPull = context.eventName === 'pull_request';
+            const sha = fromPull ? context.payload.pull_request.head.sha : context.sha;
+            const pulls = fromPull
+              ? [context.payload.pull_request]
+              : await github.paginate(github.rest.pulls.list, {
+                  ...repo, state: 'open', base: 'main', head: `${repo.owner}:stage`,
+                });
+            const marker = '<!-- pallet-site-stage-status -->';
+            const commitMarker = `<!-- stage-commit:${sha} -->`;
+            const run = `https://github.com/${repo.owner}/${repo.repo}/actions/runs/${context.runId}`;
+            const { LINT_RESULT, E2E_RESULT, PACKAGE_RESULT, DEPLOY_RESULT } = process.env;
+            const checkStatus = LINT_RESULT === 'success' && E2E_RESULT === 'success'
+              ? 'Passed'
+              : `Lint: ${LINT_RESULT}; Playwright: ${E2E_RESULT}`;
+            const deployStatus = {
+              success: 'Deployed and verified',
+              failure: 'Deployment failed',
+              cancelled: 'Deployment cancelled',
+              skipped: `Deployment skipped (packaging: ${PACKAGE_RESULT})`,
+            }[DEPLOY_RESULT] ?? 'Deployment status unavailable';
+
+            for (const pull of pulls) {
+              const params = { ...repo, issue_number: pull.number };
+              const { data: current } = await github.rest.pulls.get({ ...repo, pull_number: pull.number });
+              if (current.state !== 'open' || current.head.sha !== sha || current.base.ref !== 'main') continue;
+
+              const comments = await github.paginate(github.rest.issues.listComments, params);
+              const existing = comments.find((comment) =>
+                comment.user?.login === 'github-actions[bot]' && comment.body?.includes(marker),
+              );
+              const previous = existing?.body?.includes(commitMarker) ? existing.body.split('\n') : [];
+              const checkLabel = '- PR checks: ';
+              const deployLabel = '- Staging deployment: ';
+              const checks = fromPull
+                ? `${checkLabel}[${checkStatus}](${run})`
+                : previous.find((line) => line.startsWith(checkLabel)) ?? `${checkLabel}Waiting for PR checks`;
+              const deployment = fromPull
+                ? previous.find((line) => line.startsWith(deployLabel)) ?? `${deployLabel}Waiting for staging deployment`
+                : `${deployLabel}[${deployStatus}](${run})`;
+              const body = [
+                marker, commitMarker, '### Pallet Site staging', '',
+                '- Website: [Open staging](https://heroic-seagreen-jaguar-29.hostingersite.com/)',
+                `- Commit: \`${sha.slice(0, 7)}\``, checks, deployment,
+              ].join('\n');
+
+              if (existing && existing.body !== body) {
+                await github.rest.issues.updateComment({ ...repo, comment_id: existing.id, body });
+              } else if (!existing) {
+                await github.rest.issues.createComment({ ...params, body });
+              }
+            }
