@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, stage]
+  push:
+    branches: [main, stage]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
+  e2e:
+    uses: ./.github/workflows/playwright.yml

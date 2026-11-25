@@ -1,0 +1,33 @@
+{
+  "name": "pallet-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "build": "tsc",
+    "build:hosting": "pnpm build && node deploy/build-static.mjs",
+    "build:watch": "tsc --watch",
+    "lint": "eslint \"src/**/*.ts\"",
+    "start": "serve src --listen tcp://127.0.0.1:4173 --no-clipboard",
+    "serve": "pnpm start",
+    "test": "playwright test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.39.4",
+    "prettier": "^3.0.0",
+    "serve": "^14.2.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.58.0"
+  }
+}

@@ -1,0 +1,16 @@
+node_modules/
+src/js/
+dist/
+test-results/
+playwright-report/
+coverage/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+.aws/
+.codex/
+.DS_Store
+*.log
