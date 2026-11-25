@@ -37,7 +37,7 @@ Playwright builds and starts the local site automatically. Set `BASE_URL` to run
 
 ## Hostinger deployment targets
 
-Hostinger builds each branch with `pnpm build:hosting` and publishes the resulting `dist/` directory.
+After CI passes, GitHub Actions runs `pnpm build:hosting` and publishes the resulting `dist/` directory to the Hostinger site for that branch. Set the repository Actions variable `HOSTINGER_USERNAME` and secret `HOSTINGER_API_TOKEN` to enable deployment. Run the CI workflow manually for each branch to deploy without another commit.
 
 | Branch  | Environment | URL                                                  |
 | ------- | ----------- | ---------------------------------------------------- |

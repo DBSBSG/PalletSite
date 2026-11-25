@@ -15,3 +15,43 @@ jobs:
     uses: ./.github/workflows/lint.yml
   e2e:
     uses: ./.github/workflows/playwright.yml
+  package:
+    if: github.event_name != 'pull_request'
+    needs: [lint, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts --config.node-linker=hoisted
+      - run: pnpm build:hosting
+      - run: cd dist && zip -q -r ../pallet-site.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pallet-site
+          path: pallet-site.zip
+
+  deploy:
+    if: >-
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stage') &&
+      vars.HOSTINGER_USERNAME != ''
+    needs: package
+    runs-on: ubuntu-latest
+    concurrency:
+      group: hostinger-${{ github.ref }}
+      cancel-in-progress: false
+    env:
+      HOSTINGER_USERNAME: ${{ vars.HOSTINGER_USERNAME }}
+      HOSTINGER_DOMAIN: ${{ github.ref_name == 'main' && 'mobile-seashell-zebra-35.hostingersite.com' || 'heroic-seagreen-jaguar-29.hostingersite.com' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: pallet-site
+      - name: Deploy and verify
+        env:
+          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+        run: bash deploy/publish-static.sh pallet-site.zip
