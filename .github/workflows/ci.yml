@@ -40,6 +40,9 @@ jobs:
       vars.HOSTINGER_USERNAME != ''
     needs: package
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name == 'main' && 'Production' || 'Staging' }}
+      url: ${{ format('https://{0}/', env.HOSTINGER_DOMAIN) }}
     concurrency:
       group: hostinger-${{ github.ref }}
       cancel-in-progress: false
