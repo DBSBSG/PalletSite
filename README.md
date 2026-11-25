@@ -1,6 +1,6 @@
 # Pallet Site
 
-Site for Pallet Idea.
+A U.S. liquidation supplier directory for Amazon returns, overstock, and wholesale pallets.
 
 The site skeleton uses the same Node.js, pnpm, TypeScript, ESLint, Prettier, and Playwright toolchain as TownSeeker.
 
@@ -29,7 +29,8 @@ Playwright builds and starts the local site automatically. Set `BASE_URL` to run
 
 ## Layout
 
-- `src/index.html` is the placeholder homepage.
+- `src/index.html` is the marketplace homepage.
+- `src/ts/features/suppliers.ts` contains the curated supplier directory.
 - `src/ts/` is for TypeScript source. The build writes JavaScript to `src/js/`.
 - `src/css/` and `src/assets/` hold styles and site assets.
 - `tests/` holds Playwright tests.
@@ -43,3 +44,15 @@ After CI passes, GitHub Actions runs `pnpm build:hosting` and publishes the resu
 | ------- | ----------- | ---------------------------------------------------- |
 | `main`  | Production  | https://mobile-seashell-zebra-35.hostingersite.com/  |
 | `stage` | Staging     | https://heroic-seagreen-jaguar-29.hostingersite.com/ |
+
+## Supplier research
+
+| Source                      | Public material                                                                                                                            | Buying model                                   |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| Amazon Liquidation Auctions | [Official B2B storefront and eligibility](https://bstock.com/amazon/about/), [buyer FAQ](https://bstock.com/amazon/faq/)                   | Auctions for eligible U.S. resellers           |
+| Via Trading                 | [Wholesale catalog](https://www.viatrading.com/products), [retailer programs](https://www.viatrading.com/retailers)                        | Direct purchase or offer, depending on the lot |
+| Liquidation.com             | [Pallet inventory](https://www.liquidation.com/auction/search?size=LTL), [buying and fees](https://www.liquidation.com/c/buyer/index.html) | Auctions and eligible Buy Now listings         |
+| Target Liquidation Auctions | [Target storefront](https://bstock.com/target/)                                                                                            | Retail liquidation auctions                    |
+| Direct Liquidation          | [Wholesale marketplace](https://www.directliquidation.com/)                                                                                | Buying options vary by lot                     |
+
+The directory links to seller storefronts so customers can check available lots and terms. Supplier ingestion needs a supported feed or publishing permission. A listing feed should retain source listing IDs and timestamps, distinguish bids from fixed prices, and remove expired or sold inventory. On-site transactions require a seller agreement covering inventory, payment, freight, and order fulfillment.

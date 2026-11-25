@@ -1,13 +1,159 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Compare U.S. liquidation pallet sources, save suppliers, and find their current lots."
+    />
     <title>Pallet Site</title>
+    <link rel="icon" href="assets/pallet-mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/marketplace.css" />
+    <script type="module" src="js/marketplace.js"></script>
   </head>
   <body>
+    <a class="skip" href="#catalog">Skip to suppliers</a>
+    <header class="site-header">
+      <div class="shell header-inner">
+        <a class="brand" href="./" aria-label="Pallet Site home"
+          ><img
+            src="assets/pallet-mark.svg"
+            width="34"
+            height="34"
+            alt=""
+          />Pallet Site</a
+        >
+        <nav aria-label="Main navigation">
+          <a href="#catalog">Browse suppliers</a>
+          <a href="#buying">Buying guide</a>
+        </nav>
+        <div class="header-actions">
+          <button type="button" id="saved-toggle" aria-pressed="false">
+            Saved <span id="saved-count">0</span>
+          </button>
+          <button
+            type="button"
+            id="theme-toggle"
+            aria-pressed="true"
+            aria-label="Dark mode"
+          >
+            <span aria-hidden="true">◐</span>
+            <span class="theme-label">Dark</span>
+          </button>
+        </div>
+      </div>
+    </header>
     <main>
-      <h1>Pallet Site</h1>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="shell hero-inner">
+          <div class="hero-content">
+            <p class="eyebrow"><span></span> U.S. LIQUIDATION MARKETPLACE</p>
+            <h1 id="hero-title">Find your<br />next <em>pallet.</em></h1>
+            <p class="hero-summary">
+              Explore Amazon returns, retail overstock, and wholesale lots from
+              established liquidation suppliers.
+            </p>
+            <a class="primary" href="#catalog">Explore suppliers</a>
+          </div>
+        </div>
+      </section>
+      <section
+        class="market shell"
+        id="catalog"
+        aria-labelledby="catalog-title"
+      >
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">SUPPLIER DIRECTORY</p>
+            <h2 id="catalog-title">Shop by source</h2>
+          </div>
+          <p>
+            Find a supplier here. Check current lots, freight, and purchase
+            terms on its storefront.
+          </p>
+        </div>
+        <form class="filters" id="filters" aria-label="Filter suppliers">
+          <label class="search-field"
+            ><span>Search</span
+            ><input
+              type="search"
+              id="search"
+              placeholder="Supplier, retailer, or merchandise"
+          /></label>
+          <label
+            ><span>Inventory</span
+            ><select id="inventory">
+              <option value="">All inventory</option>
+              <option value="amazon">Amazon inventory</option>
+              <option value="returns">Customer returns</option>
+              <option value="overstock">Overstock</option>
+            </select></label
+          >
+          <label
+            ><span>Purchase type</span
+            ><select id="purchase">
+              <option value="">All purchase types</option>
+              <option value="auction">Auction</option>
+              <option value="direct">Direct purchase</option>
+            </select></label
+          >
+        </form>
+        <p class="result-status" id="result-status" role="status"></p>
+        <div class="supplier-grid" id="supplier-grid"></div>
+        <noscript
+          ><p>
+            <a href="https://bstock.com/amazon/">Amazon Liquidation Auctions</a>
+            and
+            <a href="https://www.viatrading.com/products">Via Trading</a> list
+            liquidation inventory on their storefronts.
+          </p></noscript
+        >
+      </section>
+      <section class="guide" id="buying" aria-labelledby="guide-title">
+        <div class="shell guide-inner">
+          <div>
+            <p class="eyebrow">BUYING GUIDE</p>
+            <h2 id="guide-title">Before you bid<br />or buy.</h2>
+          </div>
+          <div class="guide-items">
+            <div>
+              <h3>Check the manifest</h3>
+              <p>
+                Look for unit counts, brands, and condition grades. A returns
+                pallet may include damaged or incomplete items.
+              </p>
+            </div>
+            <div>
+              <h3>Calculate the delivered cost</h3>
+              <p>
+                Factor in buyer fees, tax, freight, and liftgate or residential
+                delivery charges.
+              </p>
+            </div>
+            <div>
+              <h3>Read the supplier’s terms</h3>
+              <p>
+                Check resale requirements, pickup deadlines, and what happens if
+                the delivered lot differs from its manifest.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
+    <footer>
+      <div class="shell footer-inner">
+        <a class="brand" href="./"
+          ><img
+            src="assets/pallet-mark.svg"
+            width="27"
+            height="27"
+            alt=""
+          />Pallet Site</a
+        >
+        <p>Purchases and bids are completed on supplier sites.</p>
+      </div>
+    </footer>
   </body>
 </html>
